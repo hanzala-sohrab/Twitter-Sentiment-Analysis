@@ -53,3 +53,34 @@ This person begins by saying something positive, but then ends it negatively. Ov
 We aim to create a machine learning model that is able to accurately classify the sentiment of a tweet. "Accuracy" for this model will be defined not only by its ability to correctly classify individual tweets, but also its ability to correctly classify large quantities of tweets to create an aggregated sentiment score.
 
 Though the accuracy of the model on individual tweets will be limited by the subjective nature of this application, we believe it is reasonable to achieve very accurate aggregate scores. Once a model has been created, trained, and validated, we intend to use it on real-time and historical tweets to collect aggregated sentiment scores for varying topics. These can be used to compare real-time responses and attitudes towards different subjects.
+
+## Overall Methodology
+
+First, we will use CountVectorizer to create a dictionary where the keys are every word in the training set and the values are the frequencies of each word.
+
+```python
+bow = CountVectorizer( lowercase=True, strip_accents='ascii', stop_words='english')`
+bow.fit(X)
+```
+
+Next, we will convert the tweet text data (which is a 1D array) to an matrix, where n is the number of tweets in the training data and w is the number of words in the vocabulary dictionary. Each value in the matrix represents the number of times a given word appears in a given tweet. This will result in a very sparse dataset.
+
+```python
+bow_matrix = bow.transform(X)
+```
+
+After this, we will use TfidfTransformer to calculate the term-frequency times inverse document-frequency (tf-idf) value for each word in the training set.
+
+term-frequency is the number of times the word appears in a tweet inverse document-frequency is the number of texts that contain the word Hence, a word's tf-idf score increases proportionally to the number of times it appears in the text, and is offset by the total number of tweets that contain the word. This is used to determine the importance of a word in a given tweet. The more times the word appears in the tweet, the more important it must be to the sentiment of the tweet. However, if many tweets contain this word, it must not be as important in differentiating between sentiments.
+
+The fit() method will learn the idf vector, which is the total number of tweets that contain each word. The transform() method will compute the tf vector and calculate the tf-idf matrix.
+
+```python
+tfidf_transformer = TfidfTransformer()
+tfdif.fit(bow_matrix)
+messages_tfidf = tfidf_transformer.transform(bow_matrix)
+```
+
+The following figure gives a visual representation of how these modules manipulate the data to prepare it for a classical estimator. 
+![image](https://user-images.githubusercontent.com/40603380/153065885-8c69cfca-9c2e-436c-9ec0-0eab9cedff8b.png)
+
